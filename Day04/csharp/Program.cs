@@ -8,7 +8,7 @@ namespace csharp
     class Program
     {
 
-
+        // This doesn't work and has off by one error for some reason.
         const uint StartRange = 402328;
         const uint EndRange = 864247;
 
@@ -27,7 +27,7 @@ namespace csharp
             var validNumbers = 0;
             var num = firstValidNumber;
             while(num <= EndRange) {
-                if(IsValidPart2(num)) {
+                if(IsValidPart2(num)) {     // Todo add switch to part 2
                     Console.WriteLine(num);
                     validNumbers++;
                 }
