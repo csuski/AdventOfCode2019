@@ -7,10 +7,10 @@ public class IntCodeComputer
     private IntCode _memory;
     private int _instructionPointer = 0;
     private bool _running;
-
     private List<int> _input;
     private int _currentInput = 0;
-    private int _output;
+    public int Output {get; private set;}
+    private int _stopReason;    // Use op code we stopped at, 99 for halt, 4 for output
 
     public int Run(IntCode program, List<int> input)
     {
@@ -28,7 +28,22 @@ public class IntCodeComputer
             DumpMemory();
             throw;
         }
-        return _output;
+        return _stopReason;
+    }
+
+    public int Resume(List<int> input) {
+        _input = input;
+        _currentInput = 0;
+        try
+        {
+            Run();
+        }
+        catch (Exception)
+        {
+            DumpMemory();
+            throw;
+        }
+        return _stopReason;
     }
 
     private void Run()
@@ -38,7 +53,7 @@ public class IntCodeComputer
         {
             ParseOpCode(_memory.State[_instructionPointer], out int operation,
                 out int paramMode1, out int paramMode2, out int paramMode3);
-
+            _stopReason = operation;    // if we stop, the stop reason is the opcode.
             switch (operation)
             {
                 case 1:
@@ -51,7 +66,8 @@ public class IntCodeComputer
                     StoreInput();
                     break;
                 case 4:
-                    _output = OutputRegister(paramMode1);
+                    Output = OutputRegister(paramMode1);
+                    _running = false; // stop on output
                     break;
                 case 5:
                     JumpIfTrue(paramMode1, paramMode2);
